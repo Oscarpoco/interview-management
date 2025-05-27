@@ -1,0 +1,79 @@
+export interface Database {
+  public: {
+    Tables: {
+      profiles: {
+        Row: {
+          id: string
+          email: string
+          full_name: string | null
+          professional_title: string | null
+          employment_status: string | null
+          avatar_url: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id: string
+          email: string
+          full_name?: string | null
+          professional_title?: string | null
+          employment_status?: string | null
+          avatar_url?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          email?: string
+          full_name?: string | null
+          professional_title?: string | null
+          employment_status?: string | null
+          avatar_url?: string | null
+          updated_at?: string
+        }
+      }
+      interviews: {
+        Row: {
+          id: string
+          user_id: string
+          company_name: string
+          interview_date: string
+          interviewer_name: string
+          job_position: string
+          priority_level: 'High' | 'Medium' | 'Low'
+          status: 'Pending' | 'Passed' | 'Failed' | 'No Feedback'
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          company_name: string
+          interview_date: string
+          interviewer_name: string
+          job_position: string
+          priority_level: 'High' | 'Medium' | 'Low'
+          status?: 'Pending' | 'Passed' | 'Failed' | 'No Feedback'
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          company_name?: string
+          interview_date?: string
+          interviewer_name?: string
+          job_position?: string
+          priority_level?: 'High' | 'Medium' | 'Low'
+          status?: 'Pending' | 'Passed' | 'Failed' | 'No Feedback'
+          updated_at?: string
+        }
+      }
+    }
+  }
+}
+
+export type Profile = Database['public']['Tables']['profiles']['Row']
+export type Interview = Database['public']['Tables']['interviews']['Row']
+export type InsertInterview = Database['public']['Tables']['interviews']['Insert']
+export type UpdateInterview = Database['public']['Tables']['interviews']['Update']
