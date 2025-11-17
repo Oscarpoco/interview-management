@@ -14,6 +14,7 @@ interface AuthContextType {
   error: string | null
   signIn: (email: string, password: string) => Promise<{ error: any }>
   signUp: (email: string, password: string, fullName: string) => Promise<{ error: any }>
+  signInWithGoogle: () => Promise<{ error: any }>
   signOut: () => Promise<void>
   updateProfile: (updates: Partial<Profile>) => Promise<{ error: any }>
 }
@@ -161,6 +162,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }
 
+  const signInWithGoogle = async () => {
+    if (!firebase.initialized || !firebase.auth) {
+      return { error: "Firebase not initialized" }
+    }
+
+    try {
+      const { signInWithPopup, GoogleAuthProvider } = await import("firebase/auth")
+      const provider = new GoogleAuthProvider()
+      console.log("Attempting to sign in with Google...")
+      await signInWithPopup(firebase.auth, provider)
+      return { error: null }
+    } catch (error: any) {
+      console.error("GOOGLE SIGNIN ERROR:", error)
+      return { error: error.message || "Failed to sign in with Google" }
+    }
+  }
+
   const signOut = async () => {
     if (!firebase.initialized || !firebase.auth) return
 
@@ -214,6 +232,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     error: firebase.error,
     signIn,
     signUp,
+    signInWithGoogle,
     signOut,
     updateProfile,
   }

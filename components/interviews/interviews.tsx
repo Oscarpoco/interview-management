@@ -11,10 +11,12 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Badge } from "@/components/ui/badge"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
-import { Plus, Search, Edit, Trash2, Calendar, Building2, UserIcon, Briefcase } from "lucide-react"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogDescription } from "@/components/ui/dialog"
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog"
+import { Plus, Search, Edit, Trash2, Calendar, Building2, UserIcon, Briefcase, Filter } from "lucide-react"
 import { format } from "date-fns"
 import { useSearchParams } from "next/navigation"
+import { toast } from "sonner"
 
 export function Interviews() {
   const { user, profile } = useAuth()
@@ -29,6 +31,8 @@ export function Interviews() {
   const [priorityFilter, setPriorityFilter] = useState<string>("all")
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [editingInterview, setEditingInterview] = useState<Interview | null>(null)
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
+  const [interviewToDelete, setInterviewToDelete] = useState<string | null>(null)
 
   // FORM STATE
   const [formData, setFormData] = useState({
@@ -148,7 +152,9 @@ export function Interviews() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!user || !profile || !firebase.initialized || !firebase.db) {
-      alert("User not authenticated or Firebase not initialized")
+      toast.error("Authentication Error", {
+        description: "User not authenticated or Firebase not initialized",
+      })
       return
     }
 
@@ -156,9 +162,6 @@ export function Interviews() {
 
     try {
       const { collection, addDoc, updateDoc, doc, serverTimestamp } = await import("firebase/firestore")
-
-      console.log("Current user:", user.uid)
-      console.log("Form data:", formData)
 
       if (editingInterview) {
         // UPDATE INTERVIEW
@@ -168,8 +171,9 @@ export function Interviews() {
           updated_at: serverTimestamp(),
         })
 
-        console.log("Interview updated successfully")
-        alert("Interview updated successfully!")
+        toast.success("Interview Updated", {
+          description: "Your interview has been updated successfully.",
+        })
       } else {
         // CREATE NEW INTERVIEW
         const insertData: InsertInterview = {
@@ -177,46 +181,56 @@ export function Interviews() {
           user_id: user.uid,
         }
 
-        console.log("Creating interview with:", insertData)
-
         await addDoc(collection(firebase.db, "interviews"), {
           ...insertData,
           created_at: serverTimestamp(),
           updated_at: serverTimestamp(),
         })
 
-        console.log("Interview created successfully")
-        alert("Interview created successfully!")
+        toast.success("Interview Created", {
+          description: "Your new interview has been added successfully.",
+        })
       }
 
       resetForm()
       setIsDialogOpen(false)
     } catch (error: any) {
       console.error("ERROR SAVING INTERVIEW:", error)
-      alert(`Failed to save interview: ${error.message || "Unknown error"}`)
+      toast.error("Failed to Save Interview", {
+        description: error.message || "An unexpected error occurred. Please try again.",
+      })
     } finally {
       setSaving(false)
     }
   }
 
   const handleDelete = async (id: string) => {
-    if (!confirm("ARE YOU SURE YOU WANT TO DELETE THIS INTERVIEW?")) return
+    setInterviewToDelete(id)
+    setDeleteDialogOpen(true)
+  }
 
-    if (!firebase.initialized || !firebase.db) {
-      alert("Firebase not initialized")
+  const confirmDelete = async () => {
+    if (!interviewToDelete || !firebase.initialized || !firebase.db) {
+      toast.error("Error", {
+        description: "Firebase not initialized or interview ID missing",
+      })
       return
     }
 
     try {
       const { deleteDoc, doc } = await import("firebase/firestore")
 
-      console.log("Deleting interview:", id)
-      await deleteDoc(doc(firebase.db, "interviews", id))
-      console.log("Interview deleted successfully")
-      alert("Interview deleted successfully!")
+      await deleteDoc(doc(firebase.db, "interviews", interviewToDelete))
+      toast.success("Interview Deleted", {
+        description: "The interview has been removed successfully.",
+      })
+      setDeleteDialogOpen(false)
+      setInterviewToDelete(null)
     } catch (error: any) {
       console.error("ERROR DELETING INTERVIEW:", error)
-      alert("Failed to delete interview. Please try again.")
+      toast.error("Failed to Delete", {
+        description: "An error occurred while deleting the interview. Please try again.",
+      })
     }
   }
 
@@ -296,159 +310,179 @@ export function Interviews() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 animate-fadeInUp">
       {/* HEADER */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">INTERVIEWS</h1>
-        <Dialog
-          open={isDialogOpen}
-          onOpenChange={(open) => {
-            setIsDialogOpen(open)
-            if (!open) resetForm()
-          }}
-        >
-          <DialogTrigger asChild>
-            <Button className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700">
-              <Plus className="h-4 w-4 mr-2" />
-              ADD INTERVIEW
-            </Button>
-          </DialogTrigger>
+        <div className="hidden md:block">
+          <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-blue-600 bg-clip-text text-transparent">
+            Interviews
+          </h1>
+          <p className="text-sm text-muted-foreground mt-1">Manage and track all your job interviews</p>
+        </div>
+        <div className="w-full md:w-auto">
+          <Dialog
+            open={isDialogOpen}
+            onOpenChange={(open) => {
+              setIsDialogOpen(open)
+              if (!open) resetForm()
+            }}
+          >
+            <DialogTrigger asChild>
+              <Button className="w-full md:w-auto bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 shadow-lg hover:shadow-xl transition-all duration-200">
+                <Plus className="h-4 w-4 mr-2" />
+                Add Interview
+              </Button>
+            </DialogTrigger>
           <DialogContent className="sm:max-w-md">
             <DialogHeader>
-              <DialogTitle>{editingInterview ? "EDIT INTERVIEW" : "ADD NEW INTERVIEW"}</DialogTitle>
+              <DialogTitle className="text-xl">
+                {editingInterview ? "Edit Interview" : "Add New Interview"}
+              </DialogTitle>
+              <DialogDescription>
+                {editingInterview ? "Update the interview details below." : "Fill in the details to create a new interview entry."}
+              </DialogDescription>
             </DialogHeader>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="company_name">COMPANY NAME</Label>
+                <Label htmlFor="company_name">Company Name</Label>
                 <Input
                   id="company_name"
                   value={formData.company_name}
                   onChange={(e) => setFormData({ ...formData, company_name: e.target.value })}
                   required
+                  className="bg-background"
                 />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="job_position">JOB POSITION</Label>
+                <Label htmlFor="job_position">Job Position</Label>
                 <Input
                   id="job_position"
                   value={formData.job_position}
                   onChange={(e) => setFormData({ ...formData, job_position: e.target.value })}
                   required
+                  className="bg-background"
                 />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="interviewer_name">INTERVIEWER NAME</Label>
+                <Label htmlFor="interviewer_name">Interviewer Name</Label>
                 <Input
                   id="interviewer_name"
                   value={formData.interviewer_name}
                   onChange={(e) => setFormData({ ...formData, interviewer_name: e.target.value })}
                   required
+                  className="bg-background"
                 />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="interview_date">INTERVIEW DATE</Label>
+                <Label htmlFor="interview_date">Interview Date</Label>
                 <Input
                   id="interview_date"
                   type="date"
                   value={formData.interview_date}
                   onChange={(e) => setFormData({ ...formData, interview_date: e.target.value })}
                   required
+                  className="bg-background"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label>PRIORITY</Label>
+                  <Label>Priority</Label>
                   <Select
                     value={formData.priority_level}
                     onValueChange={(value: "High" | "Medium" | "Low") =>
                       setFormData({ ...formData, priority_level: value })
                     }
                   >
-                    <SelectTrigger>
+                    <SelectTrigger className="bg-background">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="High">HIGH</SelectItem>
-                      <SelectItem value="Medium">MEDIUM</SelectItem>
-                      <SelectItem value="Low">LOW</SelectItem>
+                      <SelectItem value="High">High</SelectItem>
+                      <SelectItem value="Medium">Medium</SelectItem>
+                      <SelectItem value="Low">Low</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
 
                 <div className="space-y-2">
-                  <Label>STATUS</Label>
+                  <Label>Status</Label>
                   <Select
                     value={formData.status}
                     onValueChange={(value: "Pending" | "Passed" | "Failed" | "No Feedback") =>
                       setFormData({ ...formData, status: value })
                     }
                   >
-                    <SelectTrigger>
+                    <SelectTrigger className="bg-background">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="Pending">PENDING</SelectItem>
-                      <SelectItem value="Passed">PASSED</SelectItem>
-                      <SelectItem value="Failed">FAILED</SelectItem>
-                      <SelectItem value="No Feedback">NO FEEDBACK</SelectItem>
+                      <SelectItem value="Pending">Pending</SelectItem>
+                      <SelectItem value="Passed">Passed</SelectItem>
+                      <SelectItem value="Failed">Failed</SelectItem>
+                      <SelectItem value="No Feedback">No Feedback</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
               </div>
 
               <div className="flex gap-2 pt-4">
-                <Button type="submit" className="flex-1" disabled={saving}>
-                  {saving ? "SAVING..." : editingInterview ? "UPDATE" : "CREATE"}
+                <Button type="submit" className="flex-1 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700" disabled={saving}>
+                  {saving ? "Saving..." : editingInterview ? "Update" : "Create"}
                 </Button>
                 <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)} disabled={saving}>
-                  CANCEL
+                  Cancel
                 </Button>
               </div>
             </form>
           </DialogContent>
         </Dialog>
+        </div>
       </div>
 
       {/* FILTERS */}
-      <Card className="bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm border-white/20 dark:border-gray-700/20">
-        <CardContent className="p-4">
+      <Card className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-xl border-white/30 dark:border-gray-700/30 shadow-lg">
+        <CardContent className="p-5">
+          <div className="flex items-center gap-2 mb-4">
+            <Filter className="h-4 w-4 text-muted-foreground" />
+            <span className="text-sm font-medium text-muted-foreground">Filters</span>
+          </div>
           <div className="flex flex-col sm:flex-row gap-4">
             <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
               <Input
-                placeholder="SEARCH INTERVIEWS..."
+                placeholder="Search interviews..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10 bg-white/50 dark:bg-gray-700/50 border-white/20 dark:border-gray-600/20"
+                className="pl-10 bg-background/50 border-border/50 focus:border-primary/50"
               />
             </div>
 
             <Select value={statusFilter} onValueChange={setStatusFilter}>
-              <SelectTrigger className="w-full sm:w-40">
-                <SelectValue placeholder="STATUS" />
+              <SelectTrigger className="w-full sm:w-40 bg-background/50">
+                <SelectValue placeholder="Status" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">ALL STATUS</SelectItem>
-                <SelectItem value="Pending">PENDING</SelectItem>
-                <SelectItem value="Passed">PASSED</SelectItem>
-                <SelectItem value="Failed">FAILED</SelectItem>
-                <SelectItem value="No Feedback">NO FEEDBACK</SelectItem>
+                <SelectItem value="all">All Status</SelectItem>
+                <SelectItem value="Pending">Pending</SelectItem>
+                <SelectItem value="Passed">Passed</SelectItem>
+                <SelectItem value="Failed">Failed</SelectItem>
+                <SelectItem value="No Feedback">No Feedback</SelectItem>
               </SelectContent>
             </Select>
 
             <Select value={priorityFilter} onValueChange={setPriorityFilter}>
-              <SelectTrigger className="w-full sm:w-40">
-                <SelectValue placeholder="PRIORITY" />
+              <SelectTrigger className="w-full sm:w-40 bg-background/50">
+                <SelectValue placeholder="Priority" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">ALL PRIORITY</SelectItem>
-                <SelectItem value="High">HIGH</SelectItem>
-                <SelectItem value="Medium">MEDIUM</SelectItem>
-                <SelectItem value="Low">LOW</SelectItem>
+                <SelectItem value="all">All Priority</SelectItem>
+                <SelectItem value="High">High</SelectItem>
+                <SelectItem value="Medium">Medium</SelectItem>
+                <SelectItem value="Low">Low</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -458,42 +492,62 @@ export function Interviews() {
       {/* INTERVIEWS LIST */}
       <div className="grid gap-4">
         {filteredInterviews.length === 0 ? (
-          <Card className="bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm border-white/20 dark:border-gray-700/20">
-            <CardContent className="p-8 text-center">
-              <Calendar className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-              <p className="text-gray-500 dark:text-gray-400">
-                {searchTerm || statusFilter !== "all" || priorityFilter !== "all"
-                  ? "NO INTERVIEWS MATCH YOUR FILTERS"
-                  : "NO INTERVIEWS YET"}
-              </p>
+          <Card className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-xl border-white/30 dark:border-gray-700/30 shadow-lg">
+            <CardContent className="p-12 text-center">
+              <div className="flex flex-col items-center gap-4">
+                <div className="rounded-full bg-muted/50 p-6">
+                  <Calendar className="h-12 w-12 text-muted-foreground" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-semibold mb-2">
+                    {searchTerm || statusFilter !== "all" || priorityFilter !== "all"
+                      ? "No matches found"
+                      : "No interviews yet"}
+                  </h3>
+                  <p className="text-sm text-muted-foreground">
+                    {searchTerm || statusFilter !== "all" || priorityFilter !== "all"
+                      ? "Try adjusting your filters to see more results"
+                      : "Get started by adding your first interview"}
+                  </p>
+                </div>
+              </div>
             </CardContent>
           </Card>
         ) : (
-          filteredInterviews.map((interview) => (
+          filteredInterviews.map((interview, index) => (
             <Card
               key={interview.id}
-              className="bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm border-white/20 dark:border-gray-700/20 hover:bg-white/60 dark:hover:bg-gray-800/60 transition-all duration-200"
+              className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-xl border-white/30 dark:border-gray-700/30 shadow-lg hover:shadow-xl hover:scale-[1.01] transition-all duration-300 animate-fadeInUp"
+              style={{ animationDelay: `${index * 50}ms` }}
             >
               <CardContent className="p-6">
                 <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-                  <div className="space-y-3">
+                  <div className="space-y-3 flex-1">
                     <div className="flex items-center gap-3 flex-wrap">
                       <div className="flex items-center gap-2">
-                        <Building2 className="h-5 w-5 text-gray-500" />
-                        <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                        <div className="p-2 rounded-lg bg-primary/10">
+                          <Building2 className="h-4 w-4 text-primary" />
+                        </div>
+                        <h3 className="text-lg font-semibold text-foreground">
                           {interview.company_name}
                         </h3>
                       </div>
-                      <Badge className={getPriorityColor(interview.priority_level)}>{interview.priority_level}</Badge>
-                      <Badge className={getStatusColor(interview.status)}>{interview.status}</Badge>
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <Badge variant="outline" className={getPriorityColor(interview.priority_level)}>
+                          {interview.priority_level}
+                        </Badge>
+                        <Badge variant="outline" className={getStatusColor(interview.status)}>
+                          {interview.status}
+                        </Badge>
+                      </div>
                     </div>
 
                     <div className="flex items-center gap-2">
-                      <Briefcase className="h-4 w-4 text-gray-500" />
-                      <p className="text-gray-700 dark:text-gray-300 font-medium">{interview.job_position}</p>
+                      <Briefcase className="h-4 w-4 text-muted-foreground" />
+                      <p className="text-foreground font-medium">{interview.job_position}</p>
                     </div>
 
-                    <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-6 text-sm text-gray-500 dark:text-gray-400">
+                    <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-6 text-sm text-muted-foreground">
                       <div className="flex items-center gap-2">
                         <UserIcon className="h-4 w-4" />
                         <span>{interview.interviewer_name}</span>
@@ -505,7 +559,7 @@ export function Interviews() {
                     </div>
                   </div>
 
-                  <div className="flex gap-2">
+                  <div className="flex gap-2 lg:flex-col">
                     <Button
                       variant="outline"
                       size="sm"
@@ -521,16 +575,19 @@ export function Interviews() {
                         })
                         setIsDialogOpen(true)
                       }}
+                      className="hover:bg-primary/10 hover:border-primary/50"
                     >
-                      <Edit className="h-4 w-4" />
+                      <Edit className="h-4 w-4 mr-2" />
+                      Edit
                     </Button>
                     <Button
                       variant="outline"
                       size="sm"
                       onClick={() => handleDelete(interview.id)}
-                      className="text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20"
+                      className="text-destructive hover:text-destructive hover:bg-destructive/10 border-destructive/20"
                     >
-                      <Trash2 className="h-4 w-4" />
+                      <Trash2 className="h-4 w-4 mr-2" />
+                      Delete
                     </Button>
                   </div>
                 </div>
@@ -539,6 +596,24 @@ export function Interviews() {
           ))
         )}
       </div>
+
+      {/* DELETE CONFIRMATION DIALOG */}
+      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. This will permanently delete the interview from your records.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => setInterviewToDelete(null)}>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   )
 }

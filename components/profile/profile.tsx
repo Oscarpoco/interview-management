@@ -4,13 +4,14 @@ import type React from "react"
 import { useState } from "react"
 import { useAuth } from "@/contexts/auth-context"
 import { useFirebase } from "@/hooks/use-firebase"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { User, Mail, Briefcase, Camera, Save, Edit, Lock, CheckCircle } from "lucide-react"
+import { toast } from "sonner"
 
 export function Profile() {
   const { profile, updateProfile, user } = useAuth()
@@ -33,10 +34,14 @@ export function Profile() {
       const { error } = await updateProfile(formData)
       if (error) throw error
       setIsEditing(false)
-      alert("Profile updated successfully!")
+      toast.success("Profile Updated", {
+        description: "Your profile has been updated successfully.",
+      })
     } catch (error: any) {
       console.error("ERROR UPDATING PROFILE:", error)
-      alert(`Failed to update profile: ${error.message || "Unknown error"}`)
+      toast.error("Failed to Update Profile", {
+        description: error.message || "An unexpected error occurred. Please try again.",
+      })
     } finally {
       setLoading(false)
     }
@@ -54,7 +59,9 @@ export function Profile() {
   const handlePasswordReset = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!firebase.initialized || !firebase.auth) {
-      alert("Firebase not initialized")
+      toast.error("Error", {
+        description: "Firebase not initialized",
+      })
       return
     }
 
@@ -66,9 +73,14 @@ export function Profile() {
       await sendPasswordResetEmail(firebase.auth, passwordEmail)
       setPasswordSuccess(true)
       setPasswordEmail("")
+      toast.success("Password Reset Email Sent", {
+        description: "Please check your inbox for the password reset link.",
+      })
     } catch (error: any) {
       console.error("ERROR SENDING PASSWORD RESET:", error)
-      alert("Failed to send password reset email. Please try again.")
+      toast.error("Failed to Send Reset Email", {
+        description: "An error occurred. Please try again.",
+      })
     } finally {
       setPasswordLoading(false)
     }
@@ -102,11 +114,14 @@ export function Profile() {
         throw error
       }
 
-      console.log("Avatar updated successfully")
-      alert("Avatar updated successfully!")
+      toast.success("Avatar Updated", {
+        description: "Your profile picture has been updated successfully.",
+      })
     } catch (error: any) {
       console.error("ERROR UPLOADING AVATAR:", error)
-      alert("Failed to upload avatar. Please try again.")
+      toast.error("Failed to Upload Avatar", {
+        description: "An error occurred while uploading. Please try again.",
+      })
     } finally {
       setLoading(false)
     }
@@ -123,27 +138,35 @@ export function Profile() {
   }
 
   return (
-    <div className="space-y-6">
-      <h1 className="text-2xl font-bold text-gray-900 dark:text-white">PROFILE</h1>
+    <div className="space-y-6 animate-fadeInUp">
+      <div className="hidden md:block">
+        <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-blue-600 bg-clip-text text-transparent">
+          Profile
+        </h1>
+        <p className="text-sm text-muted-foreground mt-1">Manage your account settings and preferences</p>
+      </div>
 
       {/* PROFILE INFORMATION */}
-      <Card className="bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm border-white/20 dark:border-gray-700/20">
+      <Card className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-xl border-white/30 dark:border-gray-700/30 shadow-lg">
         <CardHeader>
-          <div className="flex items-center justify-between ">
-            {/* <CardTitle>PROFILE INFORMATION</CardTitle> */}
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle>Profile Information</CardTitle>
+              <CardDescription>Update your personal information and preferences</CardDescription>
+            </div>
             {!isEditing ? (
-              <Button variant="outline" onClick={() => setIsEditing(true)}>
+              <Button variant="outline" onClick={() => setIsEditing(true)} className="hover:bg-primary/10 hover:border-primary/50">
                 <Edit className="h-4 w-4 mr-2" />
-                EDIT
+                Edit
               </Button>
             ) : (
               <div className="flex gap-2">
                 <Button variant="outline" onClick={handleCancel} disabled={loading}>
-                  CANCEL
+                  Cancel
                 </Button>
-                <Button variant="outline" onClick={handleSave} disabled={loading}>
+                <Button onClick={handleSave} disabled={loading} className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700">
                   <Save className="h-4 w-4 mr-2" />
-                  {loading ? "SAVING..." : "SAVE"}
+                  {loading ? "Saving..." : "Save"}
                 </Button>
               </div>
             )}
@@ -175,61 +198,61 @@ export function Profile() {
           {/* FORM FIELDS */}
           <div className="grid gap-4">
             <div className="space-y-2">
-              <Label htmlFor="full_name">FULL NAME</Label>
+              <Label htmlFor="full_name">Full Name</Label>
               {isEditing ? (
                 <Input
                   id="full_name"
                   value={formData.full_name}
                   onChange={(e) => setFormData({ ...formData, full_name: e.target.value })}
-                  className="bg-white/50 dark:bg-gray-700/50 border-white/20 dark:border-gray-600/20"
+                  className="bg-background"
                 />
               ) : (
-                <div className="flex items-center gap-2 p-3 bg-gray-50 dark:bg-gray-700/30 rounded-md">
-                  <User className="h-4 w-4 text-gray-500" />
-                  <span className="text-gray-900 dark:text-white">{profile?.full_name || "NOT SET"}</span>
+                <div className="flex items-center gap-2 p-3 bg-muted/50 rounded-md">
+                  <User className="h-4 w-4 text-muted-foreground" />
+                  <span className="text-foreground">{profile?.full_name || "Not set"}</span>
                 </div>
               )}
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="professional_title">PROFESSIONAL TITLE</Label>
+              <Label htmlFor="professional_title">Professional Title</Label>
               {isEditing ? (
                 <Input
                   id="professional_title"
                   value={formData.professional_title}
                   onChange={(e) => setFormData({ ...formData, professional_title: e.target.value })}
                   placeholder="e.g., Software Engineer, Product Manager"
-                  className="bg-white/50 dark:bg-gray-700/50 border-white/20 dark:border-gray-600/20"
+                  className="bg-background"
                 />
               ) : (
-                <div className="flex items-center gap-2 p-3 bg-gray-50 dark:bg-gray-700/30 rounded-md">
-                  <Briefcase className="h-4 w-4 text-gray-500" />
-                  <span className="text-gray-900 dark:text-white">{profile?.professional_title || "NOT SET"}</span>
+                <div className="flex items-center gap-2 p-3 bg-muted/50 rounded-md">
+                  <Briefcase className="h-4 w-4 text-muted-foreground" />
+                  <span className="text-foreground">{profile?.professional_title || "Not set"}</span>
                 </div>
               )}
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="employment_status">EMPLOYMENT STATUS</Label>
+              <Label htmlFor="employment_status">Employment Status</Label>
               {isEditing ? (
                 <Select
                   value={formData.employment_status}
                   onValueChange={(value) => setFormData({ ...formData, employment_status: value })}
                 >
-                  <SelectTrigger className="bg-white/50 dark:bg-gray-700/50 border-white/20 dark:border-gray-600/20">
-                    <SelectValue placeholder="SELECT STATUS" />
+                  <SelectTrigger className="bg-background">
+                    <SelectValue placeholder="Select status" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="Actively Looking">ACTIVELY LOOKING</SelectItem>
-                    <SelectItem value="Open to Opportunities">OPEN TO OPPORTUNITIES</SelectItem>
-                    <SelectItem value="Employed">EMPLOYED</SelectItem>
-                    <SelectItem value="Not Looking">NOT LOOKING</SelectItem>
+                    <SelectItem value="Actively Looking">Actively Looking</SelectItem>
+                    <SelectItem value="Open to Opportunities">Open to Opportunities</SelectItem>
+                    <SelectItem value="Employed">Employed</SelectItem>
+                    <SelectItem value="Not Looking">Not Looking</SelectItem>
                   </SelectContent>
                 </Select>
               ) : (
-                <div className="flex items-center gap-2 p-3 bg-gray-50 dark:bg-gray-700/30 rounded-md">
-                  <Mail className="h-4 w-4 text-gray-500" />
-                  <span className="text-gray-900 dark:text-white">{profile?.employment_status || "NOT SET"}</span>
+                <div className="flex items-center gap-2 p-3 bg-muted/50 rounded-md">
+                  <Mail className="h-4 w-4 text-muted-foreground" />
+                  <span className="text-foreground">{profile?.employment_status || "Not set"}</span>
                 </div>
               )}
             </div>
@@ -238,17 +261,18 @@ export function Profile() {
       </Card>
 
       {/* PASSWORD RESET */}
-      <Card className="bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm border-white/20 dark:border-gray-700/20">
+      <Card className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-xl border-white/30 dark:border-gray-700/30 shadow-lg">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Lock className="h-5 w-5" />
-            PASSWORD RESET
+            Password Reset
           </CardTitle>
+          <CardDescription>Request a password reset link to be sent to your email</CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handlePasswordReset} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="password_email">EMAIL ADDRESS</Label>
+              <Label htmlFor="password_email">Email Address</Label>
               <Input
                 id="password_email"
                 type="email"
@@ -256,14 +280,14 @@ export function Profile() {
                 value={passwordEmail}
                 onChange={(e) => setPasswordEmail(e.target.value)}
                 required
-                className="bg-white/50 dark:bg-gray-700/50 border-white/20 dark:border-gray-600/20"
+                className="bg-background"
               />
             </div>
 
             {passwordSuccess && (
-              <div className="flex items-center gap-2 p-3 bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400 rounded-md">
+              <div className="flex items-center gap-2 p-3 bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400 rounded-md border border-green-200 dark:border-green-800">
                 <CheckCircle className="h-4 w-4" />
-                <span className="text-sm">PASSWORD RESET EMAIL SENT! CHECK YOUR INBOX.</span>
+                <span className="text-sm">Password reset email sent! Check your inbox.</span>
               </div>
             )}
 
@@ -272,7 +296,7 @@ export function Profile() {
               disabled={passwordLoading}
               className="bg-gradient-to-r from-red-600 to-pink-600 hover:from-red-700 hover:to-pink-700"
             >
-              {passwordLoading ? "SENDING..." : "SEND RESET EMAIL"}
+              {passwordLoading ? "Sending..." : "Send Reset Email"}
             </Button>
           </form>
         </CardContent>

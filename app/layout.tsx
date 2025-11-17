@@ -5,13 +5,14 @@ import "./globals.css"
 import { AuthProvider } from "@/contexts/auth-context"
 import { ThemeProvider } from "@/contexts/theme-context"
 import { MainLayout } from "@/components/layout/main-layout"
+import { Toaster } from "@/components/ui/sonner"
 
-const inter = Inter({ subsets: ["latin"] })
+const inter = Inter({ subsets: ["latin"], display: "swap", variable: "--font-inter" })
 
 export const metadata: Metadata = {
-  title: "Interview Management System",
+  title: "Interfy - Interview Management System",
   description: "Track and manage your job interviews with ease",
-    generator: 'v0.dev'
+  generator: "v0.dev",
 }
 
 export default function RootLayout({
@@ -21,10 +22,11 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={inter.className}>
+      <body className={`${inter.className} antialiased`} suppressHydrationWarning>
         <ThemeProvider>
           <AuthProvider>
             <MainLayout>{children}</MainLayout>
+            <Toaster position="top-right" richColors closeButton />
           </AuthProvider>
         </ThemeProvider>
       </body>

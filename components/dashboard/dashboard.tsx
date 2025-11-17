@@ -170,77 +170,96 @@ export function Dashboard() {
   }
 
   return (
-    <div className="space-y-6 mt-10 md:mt-0 ">
+    <div className="space-y-6 mt-10 md:mt-0 animate-fadeInUp">
+      {/* HEADER */}
+      <div className="hidden md:block">
+        <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-blue-600 bg-clip-text text-transparent">
+          Dashboard
+        </h1>
+        <p className="text-sm text-muted-foreground mt-1">Overview of your interview statistics</p>
+      </div>
+
       {/* STATISTICS CARDS */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 pt-5 md:pt-0">
-        <Card className="bg-gradient-to-br from-blue-500/10 to-blue-600/10 border-blue-500/20 backdrop-blur-sm">
+        <Card className="bg-gradient-to-br from-blue-500/10 via-blue-500/5 to-transparent border-blue-500/20 backdrop-blur-xl shadow-lg hover:shadow-xl hover:scale-[1.02] transition-all duration-300">
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-blue-600 dark:text-blue-400">TOTAL INTERVIEWS</p>
+              <div className="space-y-1">
+                <p className="text-sm font-medium text-blue-600 dark:text-blue-400">Total Interviews</p>
                 <p className="text-3xl font-bold text-blue-700 dark:text-blue-300">{stats.total}</p>
               </div>
-              <Calendar className="h-8 w-8 text-blue-500" />
+              <div className="p-3 rounded-xl bg-blue-500/10">
+                <Calendar className="h-6 w-6 text-blue-600 dark:text-blue-400" />
+              </div>
             </div>
           </CardContent>
         </Card>
 
-        <Card className="bg-gradient-to-br from-yellow-500/10 to-yellow-600/10 border-yellow-500/20 backdrop-blur-sm">
+        <Card className="bg-gradient-to-br from-yellow-500/10 via-yellow-500/5 to-transparent border-yellow-500/20 backdrop-blur-xl shadow-lg hover:shadow-xl hover:scale-[1.02] transition-all duration-300">
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-yellow-600 dark:text-yellow-400">NO FEEDBACK</p>
+              <div className="space-y-1">
+                <p className="text-sm font-medium text-yellow-600 dark:text-yellow-400">No Feedback</p>
                 <p className="text-3xl font-bold text-yellow-700 dark:text-yellow-300">{stats.noFeedback}</p>
               </div>
-              <Clock className="h-8 w-8 text-yellow-500" />
+              <div className="p-3 rounded-xl bg-yellow-500/10">
+                <Clock className="h-6 w-6 text-yellow-600 dark:text-yellow-400" />
+              </div>
             </div>
           </CardContent>
         </Card>
 
-        <Card className="bg-gradient-to-br from-green-500/10 to-green-600/10 border-green-500/20 backdrop-blur-sm">
+        <Card className="bg-gradient-to-br from-green-500/10 via-green-500/5 to-transparent border-green-500/20 backdrop-blur-xl shadow-lg hover:shadow-xl hover:scale-[1.02] transition-all duration-300">
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-green-600 dark:text-green-400">PASSED</p>
+              <div className="space-y-1">
+                <p className="text-sm font-medium text-green-600 dark:text-green-400">Passed</p>
                 <p className="text-3xl font-bold text-green-700 dark:text-green-300">{stats.passed}</p>
               </div>
-              <CheckCircle className="h-8 w-8 text-green-500" />
+              <div className="p-3 rounded-xl bg-green-500/10">
+                <CheckCircle className="h-6 w-6 text-green-600 dark:text-green-400" />
+              </div>
             </div>
           </CardContent>
         </Card>
 
-        <Card className="bg-gradient-to-br from-red-500/10 to-red-600/10 border-red-500/20 backdrop-blur-sm">
+        <Card className="bg-gradient-to-br from-red-500/10 via-red-500/5 to-transparent border-red-500/20 backdrop-blur-xl shadow-lg hover:shadow-xl hover:scale-[1.02] transition-all duration-300">
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-red-600 dark:text-red-400">FAILED</p>
+              <div className="space-y-1">
+                <p className="text-sm font-medium text-red-600 dark:text-red-400">Failed</p>
                 <p className="text-3xl font-bold text-red-700 dark:text-red-300">{stats.failed}</p>
               </div>
-              <XCircle className="h-8 w-8 text-red-500" />
+              <div className="p-3 rounded-xl bg-red-500/10">
+                <XCircle className="h-6 w-6 text-red-600 dark:text-red-400" />
+              </div>
             </div>
           </CardContent>
         </Card>
       </div>
 
       {/* PENDING INTERVIEWS SECTION */}
-      <Card className="bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm border-white/20 dark:border-gray-700/20">
+      <Card className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-xl border-white/30 dark:border-gray-700/30 shadow-lg">
         <CardHeader>
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-            <CardTitle className="text-xl font-semibold">PENDING INTERVIEWS</CardTitle>
+            <div>
+              <CardTitle className="text-xl font-semibold">Pending Interviews</CardTitle>
+              <p className="text-sm text-muted-foreground mt-1">Upcoming interviews that need your attention</p>
+            </div>
             <div className="flex flex-col sm:flex-row gap-2">
               <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
                 <Input
-                  placeholder="SEARCH INTERVIEWS..."
+                  placeholder="Search interviews..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10 bg-white/50 dark:bg-gray-700/50 border-white/20 dark:border-gray-600/20"
+                  className="pl-10 bg-background/50 border-border/50 focus:border-primary/50"
                 />
               </div>
               <Link href="/interviews?action=add">
-                <Button className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700">
+                <Button className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 shadow-lg hover:shadow-xl transition-all duration-200">
                   <Plus className="h-4 w-4 mr-2" />
-                  ADD INTERVIEW
+                  Add Interview
                 </Button>
               </Link>
             </div>
@@ -248,28 +267,42 @@ export function Dashboard() {
         </CardHeader>
         <CardContent>
           {filteredInterviews.length === 0 ? (
-            <div className="text-center py-8">
-              <Calendar className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-              <p className="text-gray-500 dark:text-gray-400">
-                {searchTerm ? "NO INTERVIEWS MATCH YOUR SEARCH" : "NO PENDING INTERVIEWS"}
-              </p>
+            <div className="text-center py-12">
+              <div className="flex flex-col items-center gap-4">
+                <div className="rounded-full bg-muted/50 p-6">
+                  <Calendar className="h-12 w-12 text-muted-foreground" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-semibold mb-2">
+                    {searchTerm ? "No matches found" : "No pending interviews"}
+                  </h3>
+                  <p className="text-sm text-muted-foreground">
+                    {searchTerm ? "Try adjusting your search" : "All caught up! No pending interviews at the moment."}
+                  </p>
+                </div>
+              </div>
             </div>
           ) : (
             <div className="grid gap-4">
-              {filteredInterviews.map((interview) => (
+              {filteredInterviews.map((interview, index) => (
                 <div
                   key={interview.id}
-                  className="p-4 rounded-lg bg-white/30 dark:bg-gray-700/30 border border-white/20 dark:border-gray-600/20 hover:bg-white/40 dark:hover:bg-gray-700/40 transition-all duration-200"
+                  className="p-5 rounded-xl bg-white/50 dark:bg-gray-700/50 border border-border/50 hover:bg-white/70 dark:hover:bg-gray-700/70 hover:shadow-md transition-all duration-300 animate-fadeInUp"
+                  style={{ animationDelay: `${index * 50}ms` }}
                 >
                   <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-                    <div className="space-y-2">
-                      <div className="flex items-center gap-2">
-                        <Building2 className="h-4 w-4 text-gray-500" />
-                        <h3 className="font-semibold text-gray-900 dark:text-white">{interview.company_name}</h3>
-                        <Badge className={getPriorityColor(interview.priority_level)}>{interview.priority_level}</Badge>
+                    <div className="space-y-2 flex-1">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <div className="p-2 rounded-lg bg-primary/10">
+                          <Building2 className="h-4 w-4 text-primary" />
+                        </div>
+                        <h3 className="font-semibold text-foreground">{interview.company_name}</h3>
+                        <Badge variant="outline" className={getPriorityColor(interview.priority_level)}>
+                          {interview.priority_level}
+                        </Badge>
                       </div>
-                      <p className="text-sm text-gray-600 dark:text-gray-300">{interview.job_position}</p>
-                      <div className="flex items-center gap-4 text-sm text-gray-500 dark:text-gray-400">
+                      <p className="text-sm text-muted-foreground font-medium">{interview.job_position}</p>
+                      <div className="flex items-center gap-4 text-sm text-muted-foreground">
                         <div className="flex items-center gap-1">
                           <UserIcon className="h-3 w-3" />
                           {interview.interviewer_name}
@@ -281,8 +314,8 @@ export function Dashboard() {
                       </div>
                     </div>
                     <Link href={`/interviews?edit=${interview.id}`}>
-                      <Button variant="outline" size="sm">
-                        EDIT
+                      <Button variant="outline" size="sm" className="hover:bg-primary/10 hover:border-primary/50">
+                        View Details
                       </Button>
                     </Link>
                   </div>

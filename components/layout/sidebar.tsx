@@ -31,21 +31,40 @@ export function Sidebar() {
 
 
       {/* MOBILE OVERLAY */}
-      {isOpen && <div className="fixed inset-0 bg-black/50 z-50 md:hidden" onClick={() => setIsOpen(false)} />}
+      {isOpen && <div className="fixed inset-0 bg-black/50 z-[100] md:hidden" onClick={() => setIsOpen(false)} />}
 
       {/* MOBILE MENU BUTTON */}
-
-      <div className="fixed top-0 w-full flex items-center justify-between z-40 md:hidden p-2 px-4 bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl border-t border-white/20 dark:border-gray-700/20">
-        <h1 className="text-xl uppercase font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-          {profile?.full_name || "USER"}
+      <div className="fixed top-0 w-full flex items-center justify-between z-[90] md:hidden p-3 px-4 bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl border-b border-border/50 shadow-lg">
+        <h1 className="text-lg font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-blue-600 bg-clip-text text-transparent">
+          Interfy
         </h1>
         <Button
           variant="ghost"
           size="sm"
-          className="bg-white/90 dark:bg-gray-800/90 text-gray-800 dark:text-white border border-gray-300 dark:border-gray-700 rounded-md shadow-sm hover:bg-white hover:dark:bg-gray-700 transition"
+          className="relative h-10 w-10 rounded-lg bg-gradient-to-r from-blue-500/10 to-purple-500/10 hover:from-blue-500/20 hover:to-purple-500/20 border border-primary/20 hover:border-primary/40 transition-all duration-200 hover:scale-105 active:scale-95"
           onClick={() => setIsOpen(!isOpen)}
+          aria-label="Toggle menu"
         >
-          {isOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+          <div className="relative w-5 h-5">
+            <span
+              className={cn(
+                "absolute top-0 left-0 w-5 h-0.5 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full transition-all duration-300",
+                isOpen ? "rotate-45 top-2" : "top-0"
+              )}
+            />
+            <span
+              className={cn(
+                "absolute top-2 left-0 w-5 h-0.5 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full transition-all duration-300",
+                isOpen ? "opacity-0" : "opacity-100"
+              )}
+            />
+            <span
+              className={cn(
+                "absolute top-4 left-0 w-5 h-0.5 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full transition-all duration-300",
+                isOpen ? "-rotate-45 top-2" : "top-4"
+              )}
+            />
+          </div>
         </Button>
       </div>
 
@@ -53,30 +72,31 @@ export function Sidebar() {
       {/* SIDEBAR */}
       <div
         className={cn(
-          "fixed left-0 top-0 z-50  w-full transform transition-transform duration-300 ease-in-out md:translate-x-0",
+          "fixed left-0 top-0 z-[110] w-64 h-full transform transition-transform duration-300 ease-in-out md:translate-x-0 md:z-50",
           isOpen ? "translate-x-0" : "-translate-x-full",
-          "bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl border-r border-white/20 dark:border-gray-700/20",
+          "bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl border-r border-border/50 shadow-2xl",
         )}
       >
         <div className="flex h-full flex-col">
           {/* HEADER */}
-          <div className="flex h-16 items-center justify-center border-b border-white/20 dark:border-gray-700/20">
-            <h1 className="text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-              Interview Manager
+          <div className="flex h-16 items-center justify-between px-4 border-b border-border/50">
+            <h1 className="text-xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-blue-600 bg-clip-text text-transparent">
+              Interfy
             </h1>
 
             <Button
               variant="ghost"
               size="sm"
-              className="fixed top-4 right-4 z-40 md:hidden bg-white/80 dark:bg-gray-800/80 backdrop-blur-lg "
+              className="md:hidden hover:bg-muted rounded-lg"
               onClick={() => setIsOpen(!isOpen)}
+              aria-label="Close menu"
             >
-              {isOpen ? <X className="h-8 w-8" /> : <Menu className="h-5 w-5" />}
+              <X className="h-5 w-5" />
             </Button>
           </div>
 
           {/* NAVIGATION */}
-          <nav className="flex-1 space-y-2 p-4">
+          <nav className="flex-1 space-y-1 p-4">
             {navigation.map((item) => {
               const isActive = pathname === item.href
               return (
@@ -85,10 +105,10 @@ export function Sidebar() {
                   href={item.href}
                   onClick={() => setIsOpen(false)}
                   className={cn(
-                    "flex items-center space-x-3 rounded-lg px-3 py-2 text-sm font-medium transition-all duration-200",
+                    "flex items-center space-x-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200",
                     isActive
-                      ? "bg-gradient-to-r from-blue-500/20 to-purple-500/20 text-blue-600 dark:text-blue-400 border border-blue-500/30"
-                      : "text-gray-700 dark:text-gray-300 hover:bg-white/50 dark:hover:bg-gray-800/50",
+                      ? "bg-gradient-to-r from-blue-500/20 to-purple-500/20 text-primary border border-primary/30 shadow-sm"
+                      : "text-muted-foreground hover:bg-muted/50 hover:text-foreground",
                   )}
                 >
                   <item.icon className="h-5 w-5" />
@@ -99,38 +119,43 @@ export function Sidebar() {
           </nav>
 
           {/* USER PROFILE & ACTIONS */}
-          <div className="border-t border-white/20 dark:border-gray-700/20 p-4 space-y-4">
+          <div className="border-t border-border/50 p-4 space-y-3">
             {/* THEME TOGGLE */}
             {mounted && (
-              <Button variant="ghost" size="sm" onClick={toggleTheme} className="w-full justify-start">
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                onClick={toggleTheme} 
+                className="w-full justify-start hover:bg-muted/50"
+              >
                 {theme === "dark" ? (
                   <>
                     <Sun className="h-4 w-4 mr-2" />
-                    LIGHT MODE
+                    Light Mode
                   </>
                 ) : (
                   <>
                     <Moon className="h-4 w-4 mr-2" />
-                    DARK MODE
+                    Dark Mode
                   </>
                 )}
               </Button>
             )}
 
             {/* USER INFO */}
-            <div className="flex items-center space-x-3 p-2 rounded-lg bg-white/30 dark:bg-gray-800/30">
-              <Avatar className="h-8 w-8">
+            <div className="flex items-center space-x-3 p-3 rounded-lg bg-muted/30 border border-border/50">
+              <Avatar className="h-10 w-10 ring-2 ring-primary/20">
                 <AvatarImage src={profile?.avatar_url || ""} />
-                <AvatarFallback className="bg-gradient-to-r from-blue-500 to-purple-500 text-white">
+                <AvatarFallback className="bg-gradient-to-r from-blue-500 to-purple-500 text-white font-semibold">
                   {profile?.full_name?.charAt(0) || "U"}
                 </AvatarFallback>
               </Avatar>
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
-                  {profile?.full_name || "USER"}
+                <p className="text-sm font-semibold text-foreground truncate">
+                  {profile?.full_name || "User"}
                 </p>
-                <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
-                  {profile?.professional_title || "NO TITLE"}
+                <p className="text-xs text-muted-foreground truncate">
+                  {profile?.professional_title || "No title"}
                 </p>
               </div>
             </div>
@@ -140,10 +165,10 @@ export function Sidebar() {
               variant="ghost"
               size="sm"
               onClick={handleSignOut}
-              className="w-full justify-start text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20"
+              className="w-full justify-start text-destructive hover:text-destructive hover:bg-destructive/10"
             >
               <LogOut className="h-4 w-4 mr-2" />
-              SIGN OUT
+              Sign Out
             </Button>
           </div>
         </div>

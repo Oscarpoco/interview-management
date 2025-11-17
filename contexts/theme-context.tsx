@@ -22,7 +22,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     setMounted(true)
 
     // GET THEME FROM LOCALSTORAGE OR SYSTEM PREFERENCE
-    const savedTheme = localStorage.getItem("theme") as Theme
+    const savedTheme = localStorage.getItem("theme") as Theme | null
     const systemTheme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light"
     const initialTheme = savedTheme || systemTheme
 
@@ -39,12 +39,13 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     document.documentElement.classList.toggle("dark", newTheme === "dark")
   }
 
-  // Prevent hydration mismatch by not rendering theme-dependent content until mounted
-  if (!mounted) {
-    return <div className="min-h-screen bg-white dark:bg-gray-900">{children}</div>
-  }
-
-  return <ThemeContext.Provider value={{ theme, toggleTheme, mounted }}>{children}</ThemeContext.Provider>
+  // Always render the provider to avoid hydration mismatch
+  // The mounted flag is used by consumers to know when it's safe to render theme-dependent content
+  return (
+    <ThemeContext.Provider value={{ theme, toggleTheme, mounted }}>
+      {children}
+    </ThemeContext.Provider>
+  )
 }
 
 export function useTheme() {
