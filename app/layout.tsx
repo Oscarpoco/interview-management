@@ -4,6 +4,7 @@ import { Inter } from "next/font/google"
 import "./globals.css"
 import { AuthProvider } from "@/contexts/auth-context"
 import { ThemeProvider } from "@/contexts/theme-context"
+import { LanguageProvider } from "@/contexts/language-context"
 import { MainLayout } from "@/components/layout/main-layout"
 import { Toaster } from "@/components/ui/sonner"
 
@@ -24,10 +25,12 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body className={`${inter.className} antialiased`} suppressHydrationWarning>
         <ThemeProvider>
-          <AuthProvider>
-            <MainLayout>{children}</MainLayout>
-            <Toaster position="top-right" richColors closeButton />
-          </AuthProvider>
+          <LanguageProvider>
+            <AuthProvider>
+              <MainLayout>{children}</MainLayout>
+              <Toaster position="top-right" richColors closeButton />
+            </AuthProvider>
+          </LanguageProvider>
         </ThemeProvider>
       </body>
     </html>

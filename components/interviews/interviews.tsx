@@ -348,7 +348,7 @@ export function Interviews() {
                 Add Interview
               </Button>
             </DialogTrigger>
-          <DialogContent className="sm:max-w-md">
+          <DialogContent className="sm:max-w-md z-[99999]">
             <DialogHeader>
               <DialogTitle className="text-xl">
                 {editingInterview ? "Edit Interview" : "Add New Interview"}

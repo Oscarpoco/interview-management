@@ -14,7 +14,7 @@ export function MainLayout({ children }: { children: React.ReactNode }) {
   // Show error if Firebase failed to initialize
   if (error) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-black dark:via-black dark:to-black">
         <div className="text-center max-w-md p-6">
           <div className="text-red-500 text-6xl mb-4">⚠️</div>
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Firebase Error</h1>
@@ -36,7 +36,7 @@ export function MainLayout({ children }: { children: React.ReactNode }) {
   // Show loading while Firebase is initializing
   if (!initialized || loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-black dark:via-black dark:to-black">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
           <p className="text-gray-600 dark:text-gray-400">{!initialized ? "Initializing Firebase..." : "Loading..."}</p>
@@ -50,11 +50,11 @@ export function MainLayout({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50/50 via-background to-purple-50/50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50/50 via-background to-purple-50/50 dark:from-black dark:via-black dark:to-black">
       <KeyboardShortcuts />
       <Sidebar />
       <main className="md:ml-64 min-h-screen">
-        <div className="p-4 md:p-6 lg:p-8 pt-6 pb-24 md:pt-8 md:pb-8 max-w-7xl mx-auto">{children}</div>
+        <div className="p-4 md:p-6 lg:p-8 pt-20 pb-28 md:pt-8 md:pb-8 max-w-7xl mx-auto">{children}</div>
       </main>
       <MobileNav />
       <WelcomeModal />

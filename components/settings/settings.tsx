@@ -3,6 +3,7 @@
 import { useState } from "react"
 import { useAuth } from "@/contexts/auth-context"
 import { useTheme } from "@/contexts/theme-context"
+import { useLanguage } from "@/contexts/language-context"
 import { useFirebase } from "@/hooks/use-firebase"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -17,12 +18,12 @@ import Link from "next/link"
 export function Settings() {
   const { profile, user } = useAuth()
   const { theme, toggleTheme, mounted } = useTheme()
+  const { language, setLanguage, t } = useLanguage()
   const firebase = useFirebase()
   const [notifications, setNotifications] = useState({
     email: true,
     reminders: true,
   })
-  const [language, setLanguage] = useState("en")
   const [timezone, setTimezone] = useState("UTC")
 
   const handleExportData = async () => {
@@ -95,17 +96,17 @@ export function Settings() {
     <div className="space-y-6 animate-fadeInUp pt-[15px] pb-[15px]">
       <div className="hidden md:block">
         <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-blue-600 bg-clip-text text-transparent">
-          Settings
+          {t("settings.title")}
         </h1>
-        <p className="text-sm text-muted-foreground mt-1">Manage your account settings and preferences</p>
+        <p className="text-sm text-muted-foreground mt-1">{t("settings.subtitle")}</p>
       </div>
 
       <Tabs defaultValue="general" className="w-full">
         <TabsList className="grid w-full grid-cols-2 md:grid-cols-4 mb-6">
-          <TabsTrigger value="general">General</TabsTrigger>
-          <TabsTrigger value="notifications">Notifications</TabsTrigger>
-          <TabsTrigger value="privacy">Privacy</TabsTrigger>
-          <TabsTrigger value="about">About</TabsTrigger>
+          <TabsTrigger value="general">{t("settings.general")}</TabsTrigger>
+          <TabsTrigger value="notifications">{t("settings.notifications")}</TabsTrigger>
+          <TabsTrigger value="privacy">{t("settings.privacy")}</TabsTrigger>
+          <TabsTrigger value="about">{t("settings.about")}</TabsTrigger>
         </TabsList>
 
         {/* GENERAL SETTINGS */}
@@ -114,27 +115,27 @@ export function Settings() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Globe className="h-5 w-5" />
-                Appearance
+                {t("settings.appearance")}
               </CardTitle>
-              <CardDescription>Customize the look and feel of the application</CardDescription>
+              <CardDescription>{t("settings.appearanceDesc")}</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex items-center justify-between">
                 <div className="space-y-0.5">
-                  <Label htmlFor="theme">Theme</Label>
-                  <p className="text-sm text-muted-foreground">Choose between light and dark mode</p>
+                  <Label htmlFor="theme">{t("settings.theme")}</Label>
+                  <p className="text-sm text-muted-foreground">{t("settings.themeDesc")}</p>
                 </div>
                 {mounted && (
                   <Button variant="outline" onClick={toggleTheme} className="w-32">
                     {theme === "dark" ? (
                       <>
                         <Sun className="h-4 w-4 mr-2" />
-                        Light
+                        {t("settings.light")}
                       </>
                     ) : (
                       <>
                         <Moon className="h-4 w-4 mr-2" />
-                        Dark
+                        {t("settings.dark")}
                       </>
                     )}
                   </Button>
@@ -142,7 +143,7 @@ export function Settings() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="language">Language</Label>
+                <Label htmlFor="language">{t("settings.language")}</Label>
                 <Select value={language} onValueChange={setLanguage}>
                   <SelectTrigger id="language" className="bg-background">
                     <SelectValue />
@@ -162,12 +163,12 @@ export function Settings() {
                   </SelectContent>
                 </Select>
                 <p className="text-xs text-muted-foreground">
-                  Note: The application interface is currently available in English only. Language selection is for future updates.
+                  {t("settings.languageNote")}
                 </p>
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="timezone">Timezone</Label>
+                <Label htmlFor="timezone">{t("settings.timezone")}</Label>
                 <Select value={timezone} onValueChange={setTimezone}>
                   <SelectTrigger id="timezone" className="bg-background">
                     <SelectValue />
@@ -187,19 +188,19 @@ export function Settings() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Database className="h-5 w-5" />
-                Data Management
+                {t("settings.dataManagement")}
               </CardTitle>
-              <CardDescription>Export or manage your data</CardDescription>
+              <CardDescription>{t("settings.dataDesc")}</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex items-center justify-between">
                 <div className="space-y-0.5">
-                  <Label>Export Data</Label>
-                  <p className="text-sm text-muted-foreground">Download a copy of all your data</p>
+                  <Label>{t("settings.export")}</Label>
+                  <p className="text-sm text-muted-foreground">{t("settings.exportDesc")}</p>
                 </div>
                 <Button variant="outline" onClick={handleExportData}>
                   <Download className="h-4 w-4 mr-2" />
-                  Export
+                  {t("settings.exportBtn")}
                 </Button>
               </div>
             </CardContent>
@@ -212,15 +213,15 @@ export function Settings() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Bell className="h-5 w-5" />
-                Notification Preferences
+                {t("settings.notificationPrefs")}
               </CardTitle>
-              <CardDescription>Control how you receive notifications</CardDescription>
+              <CardDescription>{t("settings.notificationDesc")}</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex items-center justify-between">
                 <div className="space-y-0.5">
-                  <Label htmlFor="email-notifications">Email Notifications</Label>
-                  <p className="text-sm text-muted-foreground">Receive notifications via email</p>
+                  <Label htmlFor="email-notifications">{t("settings.emailNotifications")}</Label>
+                  <p className="text-sm text-muted-foreground">{t("settings.emailDesc")}</p>
                 </div>
                 <Switch
                   id="email-notifications"
@@ -231,8 +232,8 @@ export function Settings() {
 
               <div className="flex items-center justify-between">
                 <div className="space-y-0.5">
-                  <Label htmlFor="reminders">Interview Reminders</Label>
-                  <p className="text-sm text-muted-foreground">Get reminded about upcoming interviews</p>
+                  <Label htmlFor="reminders">{t("settings.reminders")}</Label>
+                  <p className="text-sm text-muted-foreground">{t("settings.remindersDesc")}</p>
                 </div>
                 <Switch
                   id="reminders"
@@ -250,23 +251,23 @@ export function Settings() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Shield className="h-5 w-5" />
-                Privacy & Security
+                {t("settings.privacySecurity")}
               </CardTitle>
-              <CardDescription>Manage your privacy and security settings</CardDescription>
+              <CardDescription>{t("settings.privacyDesc")}</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="p-4 bg-muted/50 rounded-lg">
-                <h4 className="font-semibold mb-2">Account Information</h4>
+                <h4 className="font-semibold mb-2">{t("settings.accountInfo")}</h4>
                 <p className="text-sm text-muted-foreground mb-4">
-                  Your data is encrypted and stored securely. We never share your information with third parties.
+                  {t("settings.accountDesc")}
                 </p>
                 <div className="space-y-2 text-sm">
                   <div className="flex justify-between">
-                    <span className="text-muted-foreground">Email:</span>
+                    <span className="text-muted-foreground">{t("settings.email")}</span>
                     <span className="font-medium">{user?.email || "Not set"}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-muted-foreground">Account Created:</span>
+                    <span className="text-muted-foreground">{t("settings.accountCreated")}</span>
                     <span className="font-medium">
                       {profile?.created_at ? new Date(profile.created_at).toLocaleDateString() : "N/A"}
                     </span>
@@ -275,14 +276,14 @@ export function Settings() {
               </div>
 
               <div className="space-y-2">
-                <Label>Privacy Policy</Label>
+                <Label>{t("settings.privacyPolicy")}</Label>
                 <p className="text-sm text-muted-foreground mb-2">
-                  Read our privacy policy to understand how we handle your data.
+                  {t("settings.privacyPolicyDesc")}
                 </p>
                 <Link href="/rules">
                   <Button variant="outline" className="w-full sm:w-auto">
                     <FileText className="h-4 w-4 mr-2" />
-                    View Privacy Policy
+                    {t("settings.viewPolicy")}
                   </Button>
                 </Link>
               </div>
@@ -296,24 +297,24 @@ export function Settings() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Info className="h-5 w-5" />
-                About Interfy
+                {t("settings.aboutInterfy")}
               </CardTitle>
-              <CardDescription>Information about the application</CardDescription>
+              <CardDescription>{t("settings.aboutDesc")}</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2">
                 <div className="flex justify-between">
-                  <span className="text-muted-foreground">Version</span>
+                  <span className="text-muted-foreground">{t("settings.version")}</span>
                   <span className="font-medium">1.0.0</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-muted-foreground">Build</span>
-                  <span className="font-medium">Production</span>
+                  <span className="text-muted-foreground">{t("settings.build")}</span>
+                  <span className="font-medium">{t("settings.production")}</span>
                 </div>
               </div>
 
               <div className="pt-4 border-t">
-                <h4 className="font-semibold mb-2">Features</h4>
+                <h4 className="font-semibold mb-2">{t("settings.features")}</h4>
                 <ul className="space-y-1 text-sm text-muted-foreground">
                   <li>• Track and manage job interviews</li>
                   <li>• Real-time data synchronization</li>
@@ -327,7 +328,7 @@ export function Settings() {
                 <Link href="/rules">
                   <Button variant="outline" className="w-full">
                     <FileText className="h-4 w-4 mr-2" />
-                    Terms & Conditions
+                    {t("settings.terms")}
                   </Button>
                 </Link>
               </div>

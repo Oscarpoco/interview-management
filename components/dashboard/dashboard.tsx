@@ -170,7 +170,7 @@ export function Dashboard() {
   }
 
   return (
-    <div className="space-y-6 mt-10 md:mt-0 animate-fadeInUp">
+    <div className="space-y-6 animate-fadeInUp">
       {/* HEADER */}
       <div className="hidden md:block">
         <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-blue-600 bg-clip-text text-transparent">
