@@ -20,7 +20,6 @@ export function Settings() {
   const firebase = useFirebase()
   const [notifications, setNotifications] = useState({
     email: true,
-    push: false,
     reminders: true,
   })
   const [language, setLanguage] = useState("en")
@@ -93,7 +92,7 @@ export function Settings() {
   }
 
   return (
-    <div className="space-y-6 animate-fadeInUp">
+    <div className="space-y-6 animate-fadeInUp pt-[15px] pb-[15px]">
       <div className="hidden md:block">
         <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-blue-600 bg-clip-text text-transparent">
           Settings
@@ -150,11 +149,21 @@ export function Settings() {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="en">English</SelectItem>
-                    <SelectItem value="es">Spanish</SelectItem>
-                    <SelectItem value="fr">French</SelectItem>
-                    <SelectItem value="de">German</SelectItem>
+                    <SelectItem value="af">Afrikaans</SelectItem>
+                    <SelectItem value="zu">isiZulu</SelectItem>
+                    <SelectItem value="xh">isiXhosa</SelectItem>
+                    <SelectItem value="nso">Sepedi</SelectItem>
+                    <SelectItem value="st">Sesotho</SelectItem>
+                    <SelectItem value="tn">Setswana</SelectItem>
+                    <SelectItem value="ts">Xitsonga</SelectItem>
+                    <SelectItem value="ve">Tshivenda</SelectItem>
+                    <SelectItem value="ss">siSwati</SelectItem>
+                    <SelectItem value="nr">isiNdebele</SelectItem>
                   </SelectContent>
                 </Select>
+                <p className="text-xs text-muted-foreground">
+                  Note: The application interface is currently available in English only. Language selection is for future updates.
+                </p>
               </div>
 
               <div className="space-y-2">
@@ -217,18 +226,6 @@ export function Settings() {
                   id="email-notifications"
                   checked={notifications.email}
                   onCheckedChange={(checked) => setNotifications({ ...notifications, email: checked })}
-                />
-              </div>
-
-              <div className="flex items-center justify-between">
-                <div className="space-y-0.5">
-                  <Label htmlFor="push-notifications">Push Notifications</Label>
-                  <p className="text-sm text-muted-foreground">Receive browser push notifications</p>
-                </div>
-                <Switch
-                  id="push-notifications"
-                  checked={notifications.push}
-                  onCheckedChange={(checked) => setNotifications({ ...notifications, push: checked })}
                 />
               </div>
 
