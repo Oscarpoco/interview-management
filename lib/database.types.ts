@@ -5,6 +5,10 @@ export interface Profile {
   professional_title: string | null
   employment_status: string | null
   avatar_url: string | null
+  cover_photo_url: string | null
+  terms_accepted: boolean
+  terms_accepted_at: string | null
+  onboarding_completed: boolean
   created_at: string
   updated_at: string
 }

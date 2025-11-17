@@ -267,18 +267,30 @@ export function Dashboard() {
         </CardHeader>
         <CardContent>
           {filteredInterviews.length === 0 ? (
-            <div className="text-center py-12">
+            <div className="text-center py-8 md:py-12">
               <div className="flex flex-col items-center gap-4">
-                <div className="rounded-full bg-muted/50 p-6">
-                  <Calendar className="h-12 w-12 text-muted-foreground" />
+                <div className="rounded-full bg-gradient-to-br from-blue-500/10 to-purple-500/10 p-6 border border-primary/20">
+                  <Calendar className="h-12 w-12 text-primary" />
                 </div>
                 <div>
-                  <h3 className="text-lg font-semibold mb-2">
+                  <h3 className="text-lg md:text-xl font-semibold mb-2">
                     {searchTerm ? "No matches found" : "No pending interviews"}
                   </h3>
-                  <p className="text-sm text-muted-foreground">
-                    {searchTerm ? "Try adjusting your search" : "All caught up! No pending interviews at the moment."}
+                  <p className="text-sm text-muted-foreground max-w-md mx-auto">
+                    {searchTerm
+                      ? "Try adjusting your search to find interviews"
+                      : "All caught up! No pending interviews at the moment. Great job staying organized!"}
                   </p>
+                  {!searchTerm && stats.total === 0 && (
+                    <div className="mt-4">
+                      <Link href="/interviews?action=add">
+                        <Button className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700">
+                          <Plus className="h-4 w-4 mr-2" />
+                          Add Your First Interview
+                        </Button>
+                      </Link>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>

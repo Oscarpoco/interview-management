@@ -17,6 +17,7 @@ interface AuthContextType {
   signInWithGoogle: () => Promise<{ error: any }>
   signOut: () => Promise<void>
   updateProfile: (updates: Partial<Profile>) => Promise<{ error: any }>
+  deleteAccount: () => Promise<void>
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
@@ -86,6 +87,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setProfile({
           id: profileSnap.id,
           ...profileData,
+          // Ensure new fields have default values for existing profiles
+          terms_accepted: profileData.terms_accepted ?? false,
+          terms_accepted_at: profileData.terms_accepted_at || null,
+          onboarding_completed: profileData.onboarding_completed ?? false,
           // Convert Firestore timestamps to strings
           created_at: profileData.created_at?.toDate?.()?.toISOString() || profileData.created_at,
           updated_at: profileData.updated_at?.toDate?.()?.toISOString() || profileData.updated_at,
@@ -99,6 +104,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           professional_title: null,
           employment_status: null,
           avatar_url: user.photoURL || null,
+          cover_photo_url: null,
+          terms_accepted: false,
+          terms_accepted_at: null,
+          onboarding_completed: false,
           created_at: serverTimestamp(),
           updated_at: serverTimestamp(),
         }
@@ -113,6 +122,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           professional_title: null,
           employment_status: null,
           avatar_url: user.photoURL || null,
+          cover_photo_url: null,
+          terms_accepted: false,
+          terms_accepted_at: null,
+          onboarding_completed: false,
           created_at: new Date().toISOString(),
           updated_at: new Date().toISOString(),
         })
@@ -154,6 +167,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       await updateProfile(user, {
         displayName: fullName,
       })
+
+      // Profile will be created in fetchOrCreateProfile with terms_accepted: false
+      // User will need to accept terms in the welcome modal
 
       return { error: null }
     } catch (error: any) {
@@ -224,6 +240,72 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }
 
+  const deleteAccount = async () => {
+    if (!user || !firebase.initialized || !firebase.auth || !firebase.db || !firebase.storage) {
+      throw new Error("Firebase not initialized or user not authenticated")
+    }
+
+    try {
+      const { deleteDoc, doc, collection, query, where, getDocs } = await import("firebase/firestore")
+      const { deleteUser } = await import("firebase/auth")
+      const { ref, listAll, deleteObject } = await import("firebase/storage")
+
+      // Delete all user interviews
+      const interviewsQuery = query(collection(firebase.db, "interviews"), where("user_id", "==", user.uid))
+      const interviewsSnapshot = await getDocs(interviewsQuery)
+      const deleteInterviewPromises = interviewsSnapshot.docs.map((docSnap) => deleteDoc(docSnap.ref))
+      await Promise.all(deleteInterviewPromises)
+
+      // Delete user profile
+      const profileRef = doc(firebase.db, "profiles", user.uid)
+      await deleteDoc(profileRef)
+
+      // Delete user storage files (avatars and covers)
+      // Extract file path from Firebase Storage URLs
+      try {
+        if (profile?.avatar_url) {
+          try {
+            // Extract path from Firebase Storage URL
+            // URL format: https://firebasestorage.googleapis.com/v0/b/{bucket}/o/{path}?alt=media
+            const url = new URL(profile.avatar_url)
+            const pathMatch = url.pathname.match(/\/o\/(.+)\?/)
+            if (pathMatch) {
+              const filePath = decodeURIComponent(pathMatch[1])
+              const avatarRef = ref(firebase.storage, filePath)
+              await deleteObject(avatarRef)
+            }
+          } catch (e) {
+            console.log("Avatar file not found or already deleted:", e)
+          }
+        }
+        if (profile?.cover_photo_url) {
+          try {
+            const url = new URL(profile.cover_photo_url)
+            const pathMatch = url.pathname.match(/\/o\/(.+)\?/)
+            if (pathMatch) {
+              const filePath = decodeURIComponent(pathMatch[1])
+              const coverRef = ref(firebase.storage, filePath)
+              await deleteObject(coverRef)
+            }
+          } catch (e) {
+            console.log("Cover photo file not found or already deleted:", e)
+          }
+        }
+      } catch (storageError) {
+        console.error("Error deleting storage files:", storageError)
+        // Continue with account deletion even if storage deletion fails
+      }
+
+      // Delete Firebase Auth user
+      await deleteUser(user)
+
+      console.log("Account deleted successfully")
+    } catch (error: any) {
+      console.error("ERROR DELETING ACCOUNT:", error)
+      throw error
+    }
+  }
+
   const value = {
     user,
     profile,
@@ -235,6 +317,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     signInWithGoogle,
     signOut,
     updateProfile,
+    deleteAccount,
   }
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>

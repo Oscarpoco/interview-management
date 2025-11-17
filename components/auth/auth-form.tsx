@@ -9,8 +9,10 @@ import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Eye, EyeOff, Loader2, Mail, Lock, User, Briefcase } from "lucide-react"
 import { Separator } from "@/components/ui/separator"
+import { Checkbox } from "@/components/ui/checkbox"
 import Image from "next/image"
 import { toast } from "sonner"
+import Link from "next/link"
 
 export function AuthForm() {
   const [isLogin, setIsLogin] = useState(true)
@@ -21,6 +23,7 @@ export function AuthForm() {
   const [loading, setLoading] = useState(false)
   const [googleLoading, setGoogleLoading] = useState(false)
   const [error, setError] = useState("")
+  const [termsAccepted, setTermsAccepted] = useState(false)
 
   const { signIn, signUp, signInWithGoogle } = useAuth()
 
@@ -38,6 +41,12 @@ export function AuthForm() {
 
     if (!isLogin && !fullName.trim()) {
       setError("Full name is required for registration")
+      setLoading(false)
+      return
+    }
+
+    if (!isLogin && !termsAccepted) {
+      setError("You must accept the terms and conditions to create an account")
       setLoading(false)
       return
     }
@@ -174,9 +183,12 @@ export function AuthForm() {
           <div className="w-full max-w-md space-y-6">
             {/* Header */}
             <div className="text-center space-y-2">
-              <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-blue-600 bg-clip-text text-transparent">
-                Interfy
-              </h1>
+              <div className="flex items-center justify-center gap-2 mb-2">
+                <Briefcase className="h-8 w-8 text-primary" />
+                <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-blue-600 bg-clip-text text-transparent">
+                  Interfy
+                </h1>
+              </div>
               <p className="text-muted-foreground">
                 {isLogin ? "Sign in to your account" : "Create a new account"}
               </p>
@@ -298,6 +310,27 @@ export function AuthForm() {
                 </div>
               </div>
 
+              {!isLogin && (
+                <div className="flex items-start space-x-3 p-3 bg-muted/50 rounded-lg border">
+                  <Checkbox
+                    id="terms-checkbox"
+                    checked={termsAccepted}
+                    onCheckedChange={(checked) => setTermsAccepted(checked === true)}
+                    className="mt-1"
+                  />
+                  <Label htmlFor="terms-checkbox" className="text-sm leading-relaxed cursor-pointer">
+                    I agree to the{" "}
+                    <Link href="/rules" target="_blank" className="text-primary hover:underline font-medium">
+                      Terms and Conditions
+                    </Link>{" "}
+                    and{" "}
+                    <Link href="/rules" target="_blank" className="text-primary hover:underline font-medium">
+                      Privacy Policy
+                    </Link>
+                  </Label>
+                </div>
+              )}
+
               {error && (
                 <div className="text-destructive text-sm text-center bg-destructive/10 border border-destructive/20 p-3 rounded-md">
                   {error}
@@ -307,7 +340,7 @@ export function AuthForm() {
               <Button
                 type="submit"
                 className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 shadow-lg hover:shadow-xl transition-all duration-200 h-11"
-                disabled={loading || googleLoading}
+                disabled={loading || googleLoading || (!isLogin && !termsAccepted)}
               >
                 {loading ? (
                   <>
@@ -331,6 +364,7 @@ export function AuthForm() {
                   setError("")
                   setPassword("")
                   setFullName("")
+                  setTermsAccepted(false)
                 }}
                 className="text-sm"
               >

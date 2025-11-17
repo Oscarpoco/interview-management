@@ -5,6 +5,8 @@ import { useAuth } from "@/contexts/auth-context"
 import { Sidebar } from "./sidebar"
 import { MobileNav } from "./mobile-nav"
 import { AuthForm } from "../auth/auth-form"
+import { WelcomeModal } from "../onboarding/welcome-modal"
+import { KeyboardShortcuts } from "../ui/keyboard-shortcuts"
 
 export function MainLayout({ children }: { children: React.ReactNode }) {
   const { user, loading, initialized, error } = useAuth()
@@ -49,11 +51,13 @@ export function MainLayout({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50/50 via-background to-purple-50/50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
+      <KeyboardShortcuts />
       <Sidebar />
       <main className="md:ml-64 min-h-screen">
-        <div className="p-4 md:p-8 pb-20 md:pb-8 max-w-7xl mx-auto">{children}</div>
+        <div className="p-4 md:p-6 lg:p-8 pt-6 pb-24 md:pt-8 md:pb-8 max-w-7xl mx-auto">{children}</div>
       </main>
       <MobileNav />
+      <WelcomeModal />
     </div>
   )
 }

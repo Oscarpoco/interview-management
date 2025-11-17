@@ -159,6 +159,12 @@ export function Interviews() {
     }
 
     setSaving(true)
+    const toastId = toast.loading(
+      editingInterview ? "Updating interview..." : "Creating interview...",
+      {
+        description: "Please wait while we save your changes.",
+      }
+    )
 
     try {
       const { collection, addDoc, updateDoc, doc, serverTimestamp } = await import("firebase/firestore")
@@ -172,6 +178,7 @@ export function Interviews() {
         })
 
         toast.success("Interview Updated", {
+          id: toastId,
           description: "Your interview has been updated successfully.",
         })
       } else {
@@ -188,6 +195,7 @@ export function Interviews() {
         })
 
         toast.success("Interview Created", {
+          id: toastId,
           description: "Your new interview has been added successfully.",
         })
       }
@@ -197,6 +205,7 @@ export function Interviews() {
     } catch (error: any) {
       console.error("ERROR SAVING INTERVIEW:", error)
       toast.error("Failed to Save Interview", {
+        id: toastId,
         description: error.message || "An unexpected error occurred. Please try again.",
       })
     } finally {
@@ -217,11 +226,16 @@ export function Interviews() {
       return
     }
 
+    const toastId = toast.loading("Deleting interview...", {
+      description: "Please wait.",
+    })
+
     try {
       const { deleteDoc, doc } = await import("firebase/firestore")
 
       await deleteDoc(doc(firebase.db, "interviews", interviewToDelete))
       toast.success("Interview Deleted", {
+        id: toastId,
         description: "The interview has been removed successfully.",
       })
       setDeleteDialogOpen(false)
@@ -229,6 +243,7 @@ export function Interviews() {
     } catch (error: any) {
       console.error("ERROR DELETING INTERVIEW:", error)
       toast.error("Failed to Delete", {
+        id: toastId,
         description: "An error occurred while deleting the interview. Please try again.",
       })
     }
@@ -493,22 +508,33 @@ export function Interviews() {
       <div className="grid gap-4">
         {filteredInterviews.length === 0 ? (
           <Card className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-xl border-white/30 dark:border-gray-700/30 shadow-lg">
-            <CardContent className="p-12 text-center">
+            <CardContent className="p-8 md:p-12 text-center">
               <div className="flex flex-col items-center gap-4">
-                <div className="rounded-full bg-muted/50 p-6">
-                  <Calendar className="h-12 w-12 text-muted-foreground" />
+                <div className="rounded-full bg-gradient-to-br from-blue-500/10 to-purple-500/10 p-6 border border-primary/20">
+                  <Calendar className="h-12 w-12 text-primary" />
                 </div>
                 <div>
-                  <h3 className="text-lg font-semibold mb-2">
+                  <h3 className="text-lg md:text-xl font-semibold mb-2">
                     {searchTerm || statusFilter !== "all" || priorityFilter !== "all"
                       ? "No matches found"
                       : "No interviews yet"}
                   </h3>
-                  <p className="text-sm text-muted-foreground">
+                  <p className="text-sm text-muted-foreground max-w-md mx-auto">
                     {searchTerm || statusFilter !== "all" || priorityFilter !== "all"
                       ? "Try adjusting your filters to see more results"
-                      : "Get started by adding your first interview"}
+                      : "Get started by adding your first interview to track your job search progress"}
                   </p>
+                  {!searchTerm && statusFilter === "all" && priorityFilter === "all" && (
+                    <div className="mt-4">
+                      <Button
+                        onClick={() => setIsDialogOpen(true)}
+                        className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
+                      >
+                        <Plus className="h-4 w-4 mr-2" />
+                        Add Your First Interview
+                      </Button>
+                    </div>
+                  )}
                 </div>
               </div>
             </CardContent>

@@ -7,13 +7,14 @@ import { useAuth } from "@/contexts/auth-context"
 import { useTheme } from "@/contexts/theme-context"
 import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { LayoutDashboard, Calendar, User, LogOut, Moon, Sun, Menu, X } from "lucide-react"
+import { LayoutDashboard, Calendar, User, LogOut, Moon, Sun, Menu, X, Briefcase, Settings } from "lucide-react"
 import { cn } from "@/lib/utils"
 
 const navigation = [
   { name: "DASHBOARD", href: "/dashboard", icon: LayoutDashboard },
   { name: "INTERVIEWS", href: "/interviews", icon: Calendar },
   { name: "PROFILE", href: "/profile", icon: User },
+  { name: "SETTINGS", href: "/settings", icon: Settings },
 ]
 
 export function Sidebar() {
@@ -35,33 +36,30 @@ export function Sidebar() {
 
       {/* MOBILE MENU BUTTON */}
       <div className="fixed top-0 w-full flex items-center justify-between z-[90] md:hidden p-3 px-4 bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl border-b border-border/50 shadow-lg">
-        <h1 className="text-lg font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-blue-600 bg-clip-text text-transparent">
-          Interfy
-        </h1>
+        <div className="flex items-center gap-2">
+          <Briefcase className="h-5 w-5 text-primary" />
+          <h1 className="text-lg font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-blue-600 bg-clip-text text-transparent">
+            Interfy
+          </h1>
+        </div>
         <Button
           variant="ghost"
           size="sm"
-          className="relative h-10 w-10 rounded-lg bg-gradient-to-r from-blue-500/10 to-purple-500/10 hover:from-blue-500/20 hover:to-purple-500/20 border border-primary/20 hover:border-primary/40 transition-all duration-200 hover:scale-105 active:scale-95"
+          className="relative h-10 w-10 rounded-lg bg-gradient-to-r from-blue-500/10 to-purple-500/10 hover:from-blue-500/20 hover:to-purple-500/20 border border-primary/20 hover:border-primary/40 transition-all duration-200 hover:scale-105 active:scale-95 shadow-sm hover:shadow-md"
           onClick={() => setIsOpen(!isOpen)}
           aria-label="Toggle menu"
         >
-          <div className="relative w-5 h-5">
-            <span
+          <div className="relative w-5 h-5 flex items-center justify-center">
+            <Menu
               className={cn(
-                "absolute top-0 left-0 w-5 h-0.5 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full transition-all duration-300",
-                isOpen ? "rotate-45 top-2" : "top-0"
+                "absolute w-5 h-5 text-primary transition-all duration-300",
+                isOpen ? "opacity-0 rotate-90 scale-0" : "opacity-100 rotate-0 scale-100"
               )}
             />
-            <span
+            <X
               className={cn(
-                "absolute top-2 left-0 w-5 h-0.5 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full transition-all duration-300",
-                isOpen ? "opacity-0" : "opacity-100"
-              )}
-            />
-            <span
-              className={cn(
-                "absolute top-4 left-0 w-5 h-0.5 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full transition-all duration-300",
-                isOpen ? "-rotate-45 top-2" : "top-4"
+                "absolute w-5 h-5 text-primary transition-all duration-300",
+                isOpen ? "opacity-100 rotate-0 scale-100" : "opacity-0 -rotate-90 scale-0"
               )}
             />
           </div>
@@ -80,9 +78,12 @@ export function Sidebar() {
         <div className="flex h-full flex-col">
           {/* HEADER */}
           <div className="flex h-16 items-center justify-between px-4 border-b border-border/50">
-            <h1 className="text-xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-blue-600 bg-clip-text text-transparent">
-              Interfy
-            </h1>
+            <div className="flex items-center gap-2">
+              <Briefcase className="h-6 w-6 text-primary" />
+              <h1 className="text-xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-blue-600 bg-clip-text text-transparent">
+                Interfy
+              </h1>
+            </div>
 
             <Button
               variant="ghost"
